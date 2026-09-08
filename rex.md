@@ -87,3 +87,9 @@
 - La tentative de vérification du SDK avec `dotnet --version` échoue : la commande `dotnet` n'est pas disponible dans l'environnement actuel.
 - La génération et la validation exécutable du starter .NET sont bloquées jusqu'à la mise à disposition du SDK .NET 10.
 - Aucun projet n'a été généré dans CODEBASEFACTORY et aucun dépôt de référence n'a été modifié.
+
+## 2026-09-08 — Publication des artefacts de configuration
+
+- Les artefacts `project.md`, `stack.md`, `assets.md` et `rex.md` ont été publiés dans le dépôt cible : https://github.com/OpenClassrooms-Student-Center/Codebase-P2-DFS-Back-end-avanc-NET
+- Commit de publication initial : `5d9c526`.
+- Le starter .NET n'est pas encore publié ; sa génération reste à effectuer dans Codespaces après mise à disposition du SDK .NET 10.
