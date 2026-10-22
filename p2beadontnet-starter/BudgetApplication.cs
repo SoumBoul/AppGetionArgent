@@ -146,7 +146,7 @@ public sealed class BudgetApplication
            
         }
 
-        var total = expenses.Sum(expense => expense.Amount);
+        decimal total = expenses.Sum(expense => expense.Amount);
         var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
         var Category = expenses.Select(expense => expense.Category).Distinct().Count();
         var Average = expenses.Average(total => total.Amount);
