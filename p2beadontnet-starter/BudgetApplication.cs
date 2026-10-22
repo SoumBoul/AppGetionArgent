@@ -31,7 +31,8 @@ public sealed class BudgetApplication
                     DisplayBasicStatistics(expenses);
                     break;
                 case 4:
-                    Console.WriteLine("Statistiques complètes : à implémenter par l'étudiant.");
+                    DisplayDetailsStatistics(expenses);
+                    
                     break;
                 case 5:
                     Console.WriteLine("Simulation voiture : à implémenter par l'étudiant.");
@@ -72,10 +73,12 @@ public sealed class BudgetApplication
             return;
         }
 
+        Console.WriteLine($"\nDate       Category       Description                       Amount\n");
         foreach (var expense in expenses.OrderByDescending(expense => expense.Date))
         {
             Console.WriteLine($"{expense.Date:dd/MM/yyyy} | {expense.Category,-12} | {expense.Description,-30} | {expense.Amount,10:0.00} €");
         }
+       
     }
 
     private void AddExpense(List<Expense> expenses)
@@ -118,5 +121,42 @@ public sealed class BudgetApplication
         Console.WriteLine($"Nombre de dépenses : {expenses.Count}");
         Console.WriteLine($"Période : {expenses.Min(expense => expense.Date):dd/MM/yyyy} - {expenses.Max(expense => expense.Date):dd/MM/yyyy}");
         Console.WriteLine("Les statistiques détaillées sont à implémenter dans le cadre de l'exercice.");
+    }
+
+    private static void DisplayDetailsStatistics(IReadOnlyCollection<Expense> expenses)
+    {
+       
+        if (expenses.Count == 0)
+        {
+            Console.WriteLine("Aucune statistique disponible.");
+            return;
+        }
+
+        foreach (var statistiques in expenses.Select(expense => expense.Category).Distinct())
+        {
+            var categoryExpenses = expenses.Where(expense => expense.Category == statistiques);
+            var totalAmount = categoryExpenses.Sum(expense => expense.Amount);
+            var NumberOfMonths = categoryExpenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
+            var AverageAmount = categoryExpenses.Average(expense => expense.Amount);
+
+            Console.WriteLine($"\n  category Expenses : {statistiques} ");
+            Console.WriteLine($"  total Amount      : {totalAmount}");
+            Console.WriteLine($"  NumberOfMonths    : {NumberOfMonths} ");
+            Console.WriteLine($"  AverageAmount     : {AverageAmount:0.00} €");
+           
+        }
+
+        var total = expenses.Sum(expense => expense.Amount);
+        var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
+        var Category = expenses.Select(expense => expense.Category).Distinct().Count();
+        var Average = expenses.Average(total => total.Amount);
+
+        Console.WriteLine("Total Of All Depenses.\n");
+
+        Console.WriteLine($"\n   Expenses : {total} ");
+        Console.WriteLine($"\n   Numbers of Months : {Months} ");
+        Console.WriteLine($"\n   Category : {Category} ");
+        Console.WriteLine($"\n   Average : {Average} ");
+
     }
 }
