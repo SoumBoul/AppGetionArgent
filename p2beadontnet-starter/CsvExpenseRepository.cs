@@ -51,6 +51,7 @@ public sealed class CsvExpenseRepository
 
     public void Add(Expense expense)
     {
+        string filepath= @"C:\Users\soumboul\AppGestionRecuperee\p2beadontnet-starter\emma_expenses.csv";
         var needsHeader = !File.Exists(filePath) || new FileInfo(filePath).Length == 0;
         using var writer = new StreamWriter(filePath, append: true, Encoding.UTF8);
 
