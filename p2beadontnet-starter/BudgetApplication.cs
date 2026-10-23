@@ -3,12 +3,19 @@ namespace p2beadontnet_starter;
 public sealed class BudgetApplication
 {
     private readonly CsvExpenseRepository repository;
-
+    static decimal Average= 0;
     public BudgetApplication(CsvExpenseRepository repository)
     {
         this.repository = repository;
     }
 
+
+    private void Clear()
+    {
+        Console.Clear();
+
+
+    }
     public void Run()
     {
         var expenses = repository.Load();
@@ -16,14 +23,18 @@ public sealed class BudgetApplication
         Console.WriteLine($"{expenses.Count} dépense(s) chargée(s).\n");
 
         var running = true;
+
+        DisplayMenu();
         while (running)
         {
-            DisplayMenu();
             switch (Input.ReadMenuChoice())
             {
                 case 1:
+
                     DisplayHistory(expenses);
                     break;
+
+
                 case 2:
                     AddExpense(expenses);
                     break;
@@ -32,10 +43,10 @@ public sealed class BudgetApplication
                     break;
                 case 4:
                     DisplayDetailsStatistics(expenses);
-                    
+
                     break;
                 case 5:
-                    Console.WriteLine("Simulation voiture : à implémenter par l'étudiant.");
+                    CarSimulation(expenses);
                     break;
                 case 6:
                     Console.WriteLine("Simulation prêt immobilier : à implémenter par l'étudiant.");
@@ -46,14 +57,29 @@ public sealed class BudgetApplication
                 default:
                     Console.WriteLine("Choix inconnu.");
                     break;
+
+
+
             }
 
-            Console.WriteLine();
+            
+            if (Input.ReadRequired("Do you want to return to the main menu? (y/n): ").ToLower() == "y")
+            {
+                Clear();
+                DisplayMenu();
+            }
+            else
+            {
+                running = false;
+            }
+
+
+
         }
-
-        Console.WriteLine("À bientôt.");
     }
-
+    
+    
+   
     private static void DisplayMenu()
     {
         Console.WriteLine("1. Afficher l'historique");
@@ -63,6 +89,9 @@ public sealed class BudgetApplication
         Console.WriteLine("5. Simulation achat d'une voiture (à implémenter)");
         Console.WriteLine("6. Simulation prêt immobilier (à implémenter)");
         Console.WriteLine("0. Quitter");
+
+       // Console.WriteLine("Retour au menu principal.");
+
     }
 
     private static void DisplayHistory(IReadOnlyCollection<Expense> expenses)
@@ -78,7 +107,7 @@ public sealed class BudgetApplication
         {
             Console.WriteLine($"{expense.Date:dd/MM/yyyy} | {expense.Category,-12} | {expense.Description,-30} | {expense.Amount,10:0.00} €");
         }
-       
+
     }
 
     private void AddExpense(List<Expense> expenses)
@@ -120,12 +149,12 @@ public sealed class BudgetApplication
 
         Console.WriteLine($"Nombre de dépenses : {expenses.Count}");
         Console.WriteLine($"Période : {expenses.Min(expense => expense.Date):dd/MM/yyyy} - {expenses.Max(expense => expense.Date):dd/MM/yyyy}");
-        Console.WriteLine("Les statistiques détaillées sont à implémenter dans le cadre de l'exercice.");
+        //Console.WriteLine("Les statistiques détaillées sont à implémenter dans le cadre de l'exercice.");
     }
 
     private static void DisplayDetailsStatistics(IReadOnlyCollection<Expense> expenses)
     {
-       
+
         if (expenses.Count == 0)
         {
             Console.WriteLine("Aucune statistique disponible.");
@@ -143,20 +172,53 @@ public sealed class BudgetApplication
             Console.WriteLine($"  total Amount      : {totalAmount}");
             Console.WriteLine($"  NumberOfMonths    : {NumberOfMonths} ");
             Console.WriteLine($"  AverageAmount     : {AverageAmount:0.00} €");
-           
+
         }
 
         decimal total = expenses.Sum(expense => expense.Amount);
         var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
         var Category = expenses.Select(expense => expense.Category).Distinct().Count();
-        var Average = expenses.Average(total => total.Amount);
+        Average = expenses.Sum(total => total.Amount/Months)  ;
 
         Console.WriteLine("Total Of All Depenses.\n");
 
         Console.WriteLine($"\n   Expenses : {total} ");
         Console.WriteLine($"\n   Numbers of Months : {Months} ");
         Console.WriteLine($"\n   Category : {Category} ");
-        Console.WriteLine($"\n   Average : {Average} ");
+        Console.WriteLine($"\n   Average By Month: {Average} ");
 
+    }
+
+
+    private static void CarSimulation(IReadOnlyCollection<Expense> expenses)
+    {
+        Console.WriteLine("\n Simulation de l'Achat d'une voiture\n");
+
+        decimal RevenuNetMensuel = Input.ReadDecimal("Le revenu net mensuel : ");
+        decimal PriceOfCar = Input.ReadDecimal("Le prix de voiture : ");
+        var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
+        decimal MoyenneMensuelleDesDepenses = expenses.Sum(total => total.Amount / Months);
+        Console.WriteLine($"La moyenne mensuelle des dépenses :{MoyenneMensuelleDesDepenses}");
+       
+        decimal épargneMensuelle = RevenuNetMensuel - MoyenneMensuelleDesDepenses;
+        try
+        {
+
+            if (épargneMensuelle <= 0)
+            {
+                throw new InvalidOperationException("\nVous ne pouvez pas épargner avec vos dépenses actuelles.");
+            }
+            decimal MonthsToSave = PriceOfCar / épargneMensuelle;
+
+            Console.WriteLine($"\nIl vous faudgirra {Math.Ceiling(MonthsToSave)} mois pour économiser pour la voiture.");
+
+        }
+        catch (InvalidOperationException ex)
+        {
+            
+            Console.WriteLine(" \nSorry,le projet ne peut pas être financé dans ces conditions.");
+
+        }
+        ;
     }
 }
