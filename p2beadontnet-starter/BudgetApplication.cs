@@ -63,7 +63,7 @@ public sealed class BudgetApplication
             }
 
             
-            if (Input.ReadRequired("Do you want to return to the main menu? (y/n): ").ToLower() == "y")
+            if (Input.ReadRequired("\n\nDo you want to return to the main menu? (y/n): ").ToLower() == "y")
             {
                 Clear();
                 DisplayMenu();
@@ -96,6 +96,7 @@ public sealed class BudgetApplication
 
     private static void DisplayHistory(IReadOnlyCollection<Expense> expenses)
     {
+        decimal totalAmount = 0;
         if (expenses.Count == 0)
         {
             Console.WriteLine("Aucune dépense enregistrée.");
@@ -105,8 +106,10 @@ public sealed class BudgetApplication
         Console.WriteLine($"\nDate       Category       Description                       Amount\n");
         foreach (var expense in expenses.OrderByDescending(expense => expense.Date))
         {
-            Console.WriteLine($"{expense.Date:dd/MM/yyyy} | {expense.Category,-12} | {expense.Description,-30} | {expense.Amount,10:0.00} €");
+            Console.WriteLine($"{expense.Date:dd/MM/yyyy} | {expense.Category,-12} | {expense.Description,-30} | {expense.Amount,10:0.00}€");
+             totalAmount = expenses.Sum(expense => expense.Amount);
         }
+        Console.Write($"\n{"",30}Toal Amount : {totalAmount,28:0.00}");
 
     }
 
@@ -149,7 +152,7 @@ public sealed class BudgetApplication
 
         Console.WriteLine($"Nombre de dépenses : {expenses.Count}");
         Console.WriteLine($"Période : {expenses.Min(expense => expense.Date):dd/MM/yyyy} - {expenses.Max(expense => expense.Date):dd/MM/yyyy}");
-        //Console.WriteLine("Les statistiques détaillées sont à implémenter dans le cadre de l'exercice.");
+       
     }
 
     private static void DisplayDetailsStatistics(IReadOnlyCollection<Expense> expenses)
