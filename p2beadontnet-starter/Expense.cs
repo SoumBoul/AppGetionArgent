@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.Unicode;
+
 namespace p2beadontnet_starter;
 
 public sealed class Expense
@@ -6,4 +9,5 @@ public sealed class Expense
     public string Category { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public decimal Amount { get; init; }
+
 }
