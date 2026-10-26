@@ -166,6 +166,8 @@ public sealed class BudgetApplication
 
         foreach (var statistiques in expenses.Select(expense => expense.Category).Distinct())
         {
+
+
             var categoryExpenses = expenses.Where(expense => expense.Category == statistiques);
             var totalAmount = categoryExpenses.Sum(expense => expense.Amount);
             var NumberOfMonths = categoryExpenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
