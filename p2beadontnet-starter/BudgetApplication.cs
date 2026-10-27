@@ -4,11 +4,11 @@ public sealed class BudgetApplication
 {
     private readonly CsvExpenseRepository repository;
     static decimal Average= 0;
+    
     public BudgetApplication(CsvExpenseRepository repository)
     {
         this.repository = repository;
     }
-
 
     private void Clear()
     {
@@ -49,7 +49,7 @@ public sealed class BudgetApplication
                     CarSimulation(expenses);
                     break;
                 case 6:
-                    Console.WriteLine("Simulation prêt immobilier : à implémenter par l'étudiant.");
+                    ImmobilierSimulation(expenses);
                     break;
                 case 0:
                     running = false;
@@ -77,9 +77,6 @@ public sealed class BudgetApplication
 
         }
     }
-    
-    
-   
     private static void DisplayMenu()
     {
         Console.WriteLine("1. Afficher l'historique");
@@ -90,7 +87,7 @@ public sealed class BudgetApplication
         Console.WriteLine("6. Simulation prêt immobilier (à implémenter)");
         Console.WriteLine("0. Quitter");
 
-       // Console.WriteLine("Retour au menu principal.");
+      
 
     }
 
@@ -176,7 +173,7 @@ public sealed class BudgetApplication
             Console.WriteLine($"\n  category Expenses : {statistiques} ");
             Console.WriteLine($"  total Amount      : {totalAmount}");
             Console.WriteLine($"  NumberOfMonths    : {NumberOfMonths} ");
-            Console.WriteLine($"  AverageAmount     : {AverageAmount:0.00} €");
+            Console.WriteLine($"  AverageAmount     : {AverageAmount:0.00} ");
 
         }
 
@@ -190,11 +187,9 @@ public sealed class BudgetApplication
         Console.WriteLine($"\n   Expenses : {total} ");
         Console.WriteLine($"\n   Numbers of Months : {Months} ");
         Console.WriteLine($"\n   Category : {Category} ");
-        Console.WriteLine($"\n   Average By Month: {Average} ");
+        Console.WriteLine($"\n   Average By Month: {Average:0.00} ");
 
     }
-
-
     private static void CarSimulation(IReadOnlyCollection<Expense> expenses)
     {
         Console.WriteLine("\n Simulation de l'Achat d'une voiture\n");
@@ -226,4 +221,83 @@ public sealed class BudgetApplication
         }
         ;
     }
+
+    private static void ImmobilierSimulation(IReadOnlyCollection<Expense> expenses)
+    {
+        Console.WriteLine("\n Simulation d'un prêt immobilier\n");
+
+        if(expenses.Where(e => e.Category == "housing").Count() == 0)
+        {
+            Console.WriteLine("\nVous n'avez pas de dépenses dans la catégorie 'housing'. Veuillez ajouter des dépenses dans cette catégorie pour effectuer la simulation.");
+            return;
+        }
+       
+
+        decimal saving = 0;
+        decimal RevenuNetMensuel = Input.ReadDecimal("Le revenu net mensuel : ");
+       
+        decimal TauxAnnuel = Input.ReadDecimal("Le Taut annuel : ");
+        decimal Duree = (Input.ReadDecimal("La Durée du prêt (en années) : "));
+
+        if (RevenuNetMensuel < 0 || TauxAnnuel < 0 || Duree <= 0)
+        {
+            Console.WriteLine("\nLes valeurs saisies doivent être positives et la durée doit être supérieure à zéro.");
+            return;
+        }
+
+        saving = expenses.Where(e => e.Category == "housing").Sum(e => e.Amount);
+        var moyenneMensuelleDesDepenses = expenses.Select(total => total.Amount).Sum() / expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
+
+
+        decimal AverageHousting = expenses.Select(e => e.Category == "housing" ? e.Amount : 0).Sum() / expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
+        decimal EpargneMensuelDisponible = RevenuNetMensuel - moyenneMensuelleDesDepenses;
+        
+        decimal mensualitéThéorique = EpargneMensuelDisponible + AverageHousting;
+
+        decimal mensualitéRetenue = decimal.Min(mensualitéThéorique, RevenuNetMensuel * 35 / 100);
+        decimal n = Duree * 12 ;
+        decimal r = TauxAnnuel/100/12 ;
+
+        Console.WriteLine($"\nLa moyenne Mensuelle Des Depenses est de : {moyenneMensuelleDesDepenses:0.00} ");
+        Console.WriteLine($"\nL Epargne Mensuel Disponible est de      : {EpargneMensuelDisponible:0.00} ");
+        Console.WriteLine($"\n Average Housting est de                 : {AverageHousting:0.00} €");
+
+        try
+        {
+            if(mensualitéRetenue > RevenuNetMensuel )
+            {
+                throw new InvalidOperationException($"\nVous ne pouvez pas emprunter avec vos dépenses actuelles, car la mensualité retenue de  {mensualitéRetenue} dépasse le seuil autorisé.");
+            } 
+
+            if (r==0 )
+            {
+                decimal capital = mensualitéRetenue * n;
+                Console.WriteLine($"\nLe capital que vous pouvez emprunter est de : {capital:0.00} ");
+            }
+            else
+            {
+                decimal capital = mensualitéRetenue * (1 - (decimal)Math.Pow((double)(1 + r), (double)(-n))) / r;
+                Console.WriteLine($"\nLe capital que vous pouvez emprunter est de : {capital:0.00} ");
+            }
+
+
+           
+
+        }
+        catch (InvalidOperationException ex)
+        {
+
+           Console.WriteLine(ex.Message);
+        }
+
+
+
+
+
+
+    }
+
+
+
+
 }
