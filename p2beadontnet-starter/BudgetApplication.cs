@@ -157,7 +157,7 @@ public sealed class BudgetApplication
 
         if (expenses.Count == 0)
         {
-            Console.WriteLine("Aucune statistique disponible.");
+            Console.WriteLine("\nAucune statistique disponible.");
             return;
         }
 
@@ -170,7 +170,7 @@ public sealed class BudgetApplication
             var NumberOfMonths = categoryExpenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
             var AverageAmount = categoryExpenses.Average(expense => expense.Amount);
 
-            Console.WriteLine($"\n  category Expenses : {statistiques} ");
+            Console.WriteLine($"\ncategory Expenses : {statistiques} ");
             Console.WriteLine($"  total Amount      : {totalAmount}");
             Console.WriteLine($"  NumberOfMonths    : {NumberOfMonths} ");
             Console.WriteLine($"  AverageAmount     : {AverageAmount:0.00} ");
@@ -182,12 +182,13 @@ public sealed class BudgetApplication
         var Category = expenses.Select(expense => expense.Category).Distinct().Count();
         Average = expenses.Sum(total => total.Amount/Months)  ;
 
-        Console.WriteLine("Total Of All Depenses.\n");
-
-        Console.WriteLine($"\n   Expenses : {total} ");
+        Console.WriteLine("\nTotal Of All Depenses.");
+        Console.WriteLine("---------------------------------");
+        Console.WriteLine($"\n   Expenses          : {total} ");
         Console.WriteLine($"\n   Numbers of Months : {Months} ");
-        Console.WriteLine($"\n   Category : {Category} ");
-        Console.WriteLine($"\n   Average By Month: {Average:0.00} ");
+        Console.WriteLine($"\n   Category          : {Category} ");
+        Console.WriteLine($"\n   Average By Month  : {Average:0.00} ");
+        Console.WriteLine("\n---------------------------------");
 
     }
     private static void CarSimulation(IReadOnlyCollection<Expense> expenses)
@@ -210,7 +211,7 @@ public sealed class BudgetApplication
             }
             decimal MonthsToSave = PriceOfCar / épargneMensuelle;
 
-            Console.WriteLine($"\nIl vous faudgirra {Math.Ceiling(MonthsToSave)} mois pour économiser pour la voiture.");
+            Console.WriteLine($"\nIl vous faudra {Math.Ceiling(MonthsToSave)} mois pour économiser pour la voiture.");
 
         }
         catch (InvalidOperationException ex)
@@ -224,9 +225,10 @@ public sealed class BudgetApplication
 
     private static void ImmobilierSimulation(IReadOnlyCollection<Expense> expenses)
     {
-        Console.WriteLine("\n Simulation d'un prêt immobilier\n");
-
-        if(expenses.Where(e => e.Category == "housing").Count() == 0)
+        Console.WriteLine("\n---------------------------------------");
+        Console.WriteLine("\n Simulation d'un prêt immobilier");
+        Console.WriteLine("\n---------------------------------------");
+        if (expenses.Where(e => e.Category == "housing").Count() == 0)
         {
             Console.WriteLine("\nVous n'avez pas de dépenses dans la catégorie 'housing'. Veuillez ajouter des dépenses dans cette catégorie pour effectuer la simulation.");
             return;
@@ -241,7 +243,7 @@ public sealed class BudgetApplication
             return;
         }
 
-        decimal TauxAnnuel = Input.ReadDecimal("Le Taut annuel : ");
+        decimal TauxAnnuel = Input.ReadDecimal("Le Taut annuel        : ");
         decimal Duree = (Input.ReadDecimal("La Durée du prêt (en années) : "));
 
         if (TauxAnnuel < 0 || Duree <= 0)
@@ -252,7 +254,11 @@ public sealed class BudgetApplication
 
         saving = expenses.Where(e => e.Category == "housing").Sum(e => e.Amount);
         var moyenneMensuelleDesDepenses = expenses.Select(total => total.Amount).Sum() / expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
-
+        if(moyenneMensuelleDesDepenses > RevenuNetMensuel)
+        {
+            Console.WriteLine("\nVous ne pouvez pas emprunter avec vos dépenses actuelles, car la moyenne mensuelle des dépenses dépasse le revenu net mensuel.");
+            return;
+        }
 
         decimal AverageHousting = expenses.Select(e => e.Category == "housing" ? e.Amount : 0).Sum() / expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
         decimal EpargneMensuelDisponible = RevenuNetMensuel - moyenneMensuelleDesDepenses;
@@ -262,10 +268,11 @@ public sealed class BudgetApplication
         decimal mensualitéRetenue = decimal.Min(mensualitéThéorique, RevenuNetMensuel * 35 / 100);
         decimal n = Duree * 12 ;
         decimal r = TauxAnnuel/100/12 ;
-
+        Console.WriteLine("\n-----------------------------------------------------");
         Console.WriteLine($"\nLa moyenne Mensuelle Des Depenses est de : {moyenneMensuelleDesDepenses:0.00} ");
-        Console.WriteLine($"\nL Epargne Mensuel Disponible est de      : {EpargneMensuelDisponible:0.00} ");
-        Console.WriteLine($"\n Average Housting est de                 : {AverageHousting:0.00} ");
+        Console.WriteLine($"\nL'Epargne Mensuel Disponible est de      : {EpargneMensuelDisponible:0.00} ");
+        Console.WriteLine($"\nL'Average Housting est de                : {AverageHousting:0.00} ");
+        Console.WriteLine("\n-----------------------------------------------------");
 
         try
         {
