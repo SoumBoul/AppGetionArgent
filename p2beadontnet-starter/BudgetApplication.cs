@@ -191,17 +191,34 @@ public sealed class BudgetApplication
         Console.WriteLine("\n---------------------------------");
 
     }
+
+    private static decimal MonthsNumber(IReadOnlyCollection<Expense> expenses)
+    {
+        var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
+        return Months;
+
+    }
+    private static decimal AverageOfAmountByMonths(IReadOnlyCollection<Expense> expenses)
+    {
+        var Months = MonthsNumber(expenses);
+
+        var MoyenneMensuelleDesDepenses = expenses.Sum(total => total.Amount / Months);
+        return MoyenneMensuelleDesDepenses; ;
+
+    }
     private static void CarSimulation(IReadOnlyCollection<Expense> expenses)
     {
         Console.WriteLine("\n Simulation de l'Achat d'une voiture\n");
 
         decimal RevenuNetMensuel = Input.ReadDecimal("Le revenu net mensuel : ");
         decimal PriceOfCar = Input.ReadDecimal("Le prix de voiture : ");
-        var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
-        decimal MoyenneMensuelleDesDepenses = expenses.Sum(total => total.Amount / Months);
-        Console.WriteLine($"La moyenne mensuelle des dépenses :{MoyenneMensuelleDesDepenses :0.00}");
+
+        var Months = MonthsNumber(expenses);
+        decimal AverageOfExpencesByMonth = AverageOfAmountByMonths(expenses);
+
+        Console.WriteLine($"La moyenne mensuelle des dépenses :{AverageOfExpencesByMonth:0.00}");
        
-        decimal épargneMensuelle = RevenuNetMensuel - MoyenneMensuelleDesDepenses;
+        decimal épargneMensuelle = RevenuNetMensuel - AverageOfExpencesByMonth;
         try
         {
 
@@ -228,6 +245,7 @@ public sealed class BudgetApplication
         Console.WriteLine("\n---------------------------------------");
         Console.WriteLine("\n Simulation d'un prêt immobilier");
         Console.WriteLine("\n---------------------------------------");
+
         if (expenses.Where(e => e.Category == "housing").Count() == 0)
         {
             Console.WriteLine("\nVous n'avez pas de dépenses dans la catégorie 'housing'. Veuillez ajouter des dépenses dans cette catégorie pour effectuer la simulation.");
@@ -235,7 +253,6 @@ public sealed class BudgetApplication
         }
        
 
-        decimal saving = 0;
         decimal RevenuNetMensuel = Input.ReadDecimal("Le revenu net mensuel : ");
         if(RevenuNetMensuel <= 0)
         {
@@ -252,24 +269,25 @@ public sealed class BudgetApplication
             return;
         }
 
-        saving = expenses.Where(e => e.Category == "housing").Sum(e => e.Amount);
-        var moyenneMensuelleDesDepenses = expenses.Select(total => total.Amount).Sum() / expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
-        if(moyenneMensuelleDesDepenses > RevenuNetMensuel)
+        var saving = expenses.Where(e => e.Category == "housing").Sum(e => e.Amount);
+        decimal AverageOfExpencesByMonth = AverageOfAmountByMonths(expenses);
+        if (AverageOfExpencesByMonth > RevenuNetMensuel)
         {
             Console.WriteLine("\nVous ne pouvez pas emprunter avec vos dépenses actuelles, car la moyenne mensuelle des dépenses dépasse le revenu net mensuel.");
             return;
         }
 
         decimal AverageHousting = expenses.Select(e => e.Category == "housing" ? e.Amount : 0).Sum() / expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
-        decimal EpargneMensuelDisponible = RevenuNetMensuel - moyenneMensuelleDesDepenses;
+        decimal EpargneMensuelDisponible = RevenuNetMensuel - AverageOfExpencesByMonth;
         
         decimal mensualitéThéorique = EpargneMensuelDisponible + AverageHousting;
 
         decimal mensualitéRetenue = decimal.Min(mensualitéThéorique, RevenuNetMensuel * 35 / 100);
         decimal n = Duree * 12 ;
         decimal r = TauxAnnuel/100/12 ;
+
         Console.WriteLine("\n-----------------------------------------------------");
-        Console.WriteLine($"\nLa moyenne Mensuelle Des Depenses est de : {moyenneMensuelleDesDepenses:0.00} ");
+        Console.WriteLine($"\nLa moyenne Mensuelle Des Depenses est de : {AverageOfExpencesByMonth:0.00} ");
         Console.WriteLine($"\nL'Epargne Mensuel Disponible est de      : {EpargneMensuelDisponible:0.00} ");
         Console.WriteLine($"\nL'Average Housting est de                : {AverageHousting:0.00} ");
         Console.WriteLine("\n-----------------------------------------------------");
