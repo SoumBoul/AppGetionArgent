@@ -114,6 +114,9 @@ public sealed class BudgetApplication
     {
         var expense = new Expense
         {
+
+
+
             Date = ReadDate(),
             Category = Input.ReadRequired("Catégorie : "),
             Description = Input.ReadRequired("Description : "),
@@ -234,8 +237,7 @@ public sealed class BudgetApplication
         catch (InvalidOperationException ex)
         {
             
-            Console.WriteLine(" \nSorry,le projet ne peut pas être financé dans ces conditions.");
-
+            Console.WriteLine(" " + ex.Message);
         }
         ;
     }
