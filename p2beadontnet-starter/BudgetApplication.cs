@@ -82,9 +82,9 @@ public sealed class BudgetApplication
         Console.WriteLine("1. Afficher l'historique");
         Console.WriteLine("2. Ajouter une dépense");
         Console.WriteLine("3. Statistiques de base");
-        Console.WriteLine("4. Statistiques complètes (à implémenter)");
-        Console.WriteLine("5. Simulation achat d'une voiture (à implémenter)");
-        Console.WriteLine("6. Simulation prêt immobilier (à implémenter)");
+        Console.WriteLine("4. Statistiques complètes ");
+        Console.WriteLine("5. Simulation achat d'une voiture ");
+        Console.WriteLine("6. Simulation prêt immobilier ");
         Console.WriteLine("0. Quitter");
 
       
