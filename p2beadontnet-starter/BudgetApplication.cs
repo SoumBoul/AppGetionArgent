@@ -198,7 +198,7 @@ public sealed class BudgetApplication
         decimal PriceOfCar = Input.ReadDecimal("Le prix de voiture : ");
         var Months = expenses.Select(expense => new { expense.Date.Year, expense.Date.Month }).Distinct().Count();
         decimal MoyenneMensuelleDesDepenses = expenses.Sum(total => total.Amount / Months);
-        Console.WriteLine($"La moyenne mensuelle des dépenses :{MoyenneMensuelleDesDepenses}");
+        Console.WriteLine($"La moyenne mensuelle des dépenses :{MoyenneMensuelleDesDepenses :0.00}");
        
         decimal épargneMensuelle = RevenuNetMensuel - MoyenneMensuelleDesDepenses;
         try
@@ -235,11 +235,16 @@ public sealed class BudgetApplication
 
         decimal saving = 0;
         decimal RevenuNetMensuel = Input.ReadDecimal("Le revenu net mensuel : ");
-       
+        if(RevenuNetMensuel <= 0)
+        {
+            Console.WriteLine("\nLe revenu net mensuel doit être supérieur à zéro.");
+            return;
+        }
+
         decimal TauxAnnuel = Input.ReadDecimal("Le Taut annuel : ");
         decimal Duree = (Input.ReadDecimal("La Durée du prêt (en années) : "));
 
-        if (RevenuNetMensuel < 0 || TauxAnnuel < 0 || Duree <= 0)
+        if (TauxAnnuel < 0 || Duree <= 0)
         {
             Console.WriteLine("\nLes valeurs saisies doivent être positives et la durée doit être supérieure à zéro.");
             return;
@@ -260,7 +265,7 @@ public sealed class BudgetApplication
 
         Console.WriteLine($"\nLa moyenne Mensuelle Des Depenses est de : {moyenneMensuelleDesDepenses:0.00} ");
         Console.WriteLine($"\nL Epargne Mensuel Disponible est de      : {EpargneMensuelDisponible:0.00} ");
-        Console.WriteLine($"\n Average Housting est de                 : {AverageHousting:0.00} €");
+        Console.WriteLine($"\n Average Housting est de                 : {AverageHousting:0.00} ");
 
         try
         {
@@ -289,9 +294,6 @@ public sealed class BudgetApplication
 
            Console.WriteLine(ex.Message);
         }
-
-
-
 
 
 
